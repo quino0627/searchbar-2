@@ -70,6 +70,3 @@ class TableViewController: UITableViewController , UISearchControllerDelegate, U
 
 }
 
-class MyResultView : TableViewController{
-    
-}
