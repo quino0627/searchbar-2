@@ -9,15 +9,13 @@
 import UIKit
 
 class TableViewController: UITableViewController , UISearchControllerDelegate, UISearchResultsUpdating, UISearchBarDelegate{
-    func updateSearchResults(for searchController: UISearchController) {
-        
-    }
-    
+   
     
 
     //create the search controller and result contoller
     let data = ["One","Two","Three","Four","Five","Six","Seven"]
-//    var filteredData = [String]()
+    var fileteredData = [String]()
+    
     var searchController = UISearchController()
     var resultVC = UITableViewController()
     
@@ -47,16 +45,24 @@ class TableViewController: UITableViewController , UISearchControllerDelegate, U
         resultVC.tableView.dataSource = self
     }
 
+    func updateSearchResults(for searchController: UISearchController) {
+        fileteredData = data.filter({ (data:String) -> Bool in
+            return data.lowercased().contains(searchController.searchBar.text!.lowercased()) ? true : false
+        })
+        resultVC.tableView.reloadData()
+    }
+    
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return data.count
+        print(fileteredData.count)
+        return tableView == resultVC.tableView ? fileteredData.count : data.count
+        
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
-        cell.textLabel?.text = data[indexPath.row]
+        cell.textLabel?.text = (tableView == resultVC.tableView ? fileteredData[indexPath.row] : data[indexPath.row])
         return cell
     }
     
