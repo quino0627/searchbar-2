@@ -10,62 +10,78 @@ import UIKit
 
 class TableViewController: UITableViewController , UISearchControllerDelegate, UISearchResultsUpdating, UISearchBarDelegate{
    
-    
-
-    //create the search controller and result contoller
-    let data = ["One","Two","Three","Four","Five","Six","Seven"]
-    var fileteredData = [String]()
+    var scopedData = [Data]()
+    var fileteredData = [Data]()
     
     var searchController = UISearchController()
     var resultVC = UITableViewController()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        setData()
+        
         searchController = UISearchController(searchResultsController: resultVC)
-        
         tableView.tableHeaderView = searchController.searchBar
-        
-        //if you want to make searchBar on navigation bar
-//        navigationItem.searchController = searchController
-//        navigationItem.hidesSearchBarWhenScrolling = true
-        
-        
         //usally good to set the presentation context  
         self.definesPresentationContext = true
 
-//        self.searchController
         searchController.searchResultsUpdater = self
-
         searchController.searchBar.delegate = self
-        
         searchController.delegate = self
         
         resultVC.tableView.delegate = self
         resultVC.tableView.dataSource = self
+        //scope
+        searchController.searchBar.scopeButtonTitles = ["All","A","B"]
     }
 
     func updateSearchResults(for searchController: UISearchController) {
-        fileteredData = data.filter({ (data:String) -> Bool in
-            return data.lowercased().contains(searchController.searchBar.text!.lowercased()) ? true : false
+//        fileteredData = scopedData.filter({ (scopedData:Data) -> Bool in
+//            return scopedData.main.lowercased().contains(searchController.searchBar.text!.lowercased())
+//        })
+//        resultVC.tableView.reloadData()
+//        print(fileteredData.count)
+        fileteredData = scopedData.filter({ (scopedData:Data) -> Bool in
+            let scope = searchController.searchBar.scopeButtonTitles![searchController.searchBar.selectedScopeButtonIndex]
+            if scope == "ALL"{ return true }
+            return scopedData.main.lowercased().contains(searchController.searchBar.text!.lowercased()) && scopedData.detail.rawValue == scope
         })
         resultVC.tableView.reloadData()
+    }
+    
+    func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
+        fileteredData = scopedData.filter({ (scopedData:Data) -> Bool in
+            let scope = searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]
+            if scope == "ALL"{ return true }
+            return scopedData.main.lowercased().contains(searchController.searchBar.text!.lowercased()) && scopedData.detail.rawValue == scope
+        })
+        resultVC.tableView.reloadData()
+        
     }
     
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        print(fileteredData.count)
-        return tableView == resultVC.tableView ? fileteredData.count : data.count
+        return tableView == resultVC.tableView ? fileteredData.count : scopedData.count
         
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = UITableViewCell()
-        cell.textLabel?.text = (tableView == resultVC.tableView ? fileteredData[indexPath.row] : data[indexPath.row])
+        let cell = UITableViewCell(style: UITableViewCell.CellStyle.subtitle, reuseIdentifier: "cell")
+       
+        cell.textLabel?.text = (tableView == resultVC.tableView ? fileteredData[indexPath.row].main : scopedData[indexPath.row].main)
+        cell.detailTextLabel?.text = (tableView == resultVC.tableView ? fileteredData[indexPath.row].detail : scopedData[indexPath.row].detail).rawValue
         return cell
     }
     
+    private func setData(){
+        scopedData.append(Data(main: "One", detail: .A))
+        scopedData.append(Data(main: "Two", detail: .A))
+        scopedData.append(Data(main: "Three", detail: .A))
+        scopedData.append(Data(main: "Ten", detail: .B))
+        scopedData.append(Data(main: "Eleven", detail: .B))
+        scopedData.append(Data(main: "Twelve", detail: .B))
+    }
     
 
 }
