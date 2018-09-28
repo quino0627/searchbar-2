@@ -36,15 +36,9 @@ class TableViewController: UITableViewController , UISearchControllerDelegate, U
     }
 
     func updateSearchResults(for searchController: UISearchController) {
-//        fileteredData = scopedData.filter({ (scopedData:Data) -> Bool in
-//            return scopedData.main.lowercased().contains(searchController.searchBar.text!.lowercased())
-//        })
-//        resultVC.tableView.reloadData()
-//        print(fileteredData.count)
         fileteredData = scopedData.filter({ (scopedData:Data) -> Bool in
             let scope = searchController.searchBar.scopeButtonTitles![searchController.searchBar.selectedScopeButtonIndex]
-            if scope == "ALL"{ return true }
-            return scopedData.main.lowercased().contains(searchController.searchBar.text!.lowercased()) && scopedData.detail.rawValue == scope
+            return scopedData.main.lowercased().contains(searchController.searchBar.text!.lowercased()) && (scope == scopedData.detail.rawValue || scope == "All")
         })
         resultVC.tableView.reloadData()
     }
@@ -52,23 +46,19 @@ class TableViewController: UITableViewController , UISearchControllerDelegate, U
     func searchBar(_ searchBar: UISearchBar, selectedScopeButtonIndexDidChange selectedScope: Int) {
         fileteredData = scopedData.filter({ (scopedData:Data) -> Bool in
             let scope = searchBar.scopeButtonTitles![searchBar.selectedScopeButtonIndex]
-            if scope == "ALL"{ return true }
-            return scopedData.main.lowercased().contains(searchController.searchBar.text!.lowercased()) && scopedData.detail.rawValue == scope
+            return scopedData.main.lowercased().contains(searchController.searchBar.text!.lowercased()) && (scope == scopedData.detail.rawValue || scope == "All")
         })
         resultVC.tableView.reloadData()
-        
+
     }
-    
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return tableView == resultVC.tableView ? fileteredData.count : scopedData.count
-        
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell(style: UITableViewCell.CellStyle.subtitle, reuseIdentifier: "cell")
-       
         cell.textLabel?.text = (tableView == resultVC.tableView ? fileteredData[indexPath.row].main : scopedData[indexPath.row].main)
         cell.detailTextLabel?.text = (tableView == resultVC.tableView ? fileteredData[indexPath.row].detail : scopedData[indexPath.row].detail).rawValue
         return cell
