@@ -1,18 +1,18 @@
 
 import UIKit
 
-class Data: NSObject {
+class Data {
     var main:String
-    var detail:detailType
+    var detail:detailtype
     
     
-    init(main: String, detail: detailType) {
+    init(main: String, detail: detailtype) {
         self.main = main
         self.detail = detail
     }
 }
 
-enum detailType:String {
+enum detailtype:String {
     case A = "A"
     case B = "B"
 }
