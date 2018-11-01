@@ -1,5 +1,4 @@
 
-import UIKit
 
 class Data {
     var main:String
